@@ -64,12 +64,12 @@ voice-bot/
 
 ```env
 ✅ TWILIO_ACCOUNT_SID=<your_account_sid>
-✅ TWILIO_AUTH_TOKEN=6804598af640735862f2158e22a71c14
+✅ TWILIO_AUTH_TOKEN=<your_auth_token>
 ✅ TWILIO_PHONE_NUMBER=+16202540324
-✅ SARVAM_API_KEY=sk_ujsy1xy6_lsPCsNuhc7Mhvfo9RjpB2BEK
+✅ SARVAM_API_KEY=<your_sarvam_api_key>
 ✅ LOCAL_LLM_URL=http://localhost:11434/api/chat
 ✅ LOCAL_LLM_MODEL=llama3.1:8b-instruct-q4_K_M
-✅ BASE_URL=https://probable-geologist-kudos.ngrok-free.dev
+✅ BASE_URL=https://your-ngrok-url.ngrok-free.dev
 ✅ LANGUAGE_CODE=hi-IN
 ```
 
