@@ -1,0 +1,10 @@
+Flask==3.0.0
+twilio==8.11.0
+requests==2.31.0
+python-dotenv==1.0.0
+flask-cors==4.0.0
+flask-socketio==5.3.6
+flask-sqlalchemy==3.1.1
+eventlet==0.33.3
+PyJWT==2.8.0
+reportlab==4.0.7

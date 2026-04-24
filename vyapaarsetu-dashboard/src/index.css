@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;600&family=Mukta:wght@400;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #111318;
+  --bg-elevated: #1A1E26;
+  --border: #2A2E38;
+  --accent-saffron: #FF9933;
+  --accent-green: #138808;
+  --accent-blue: #1C4ED8;
+  --accent-red: #DC2626;
+  --accent-amber: #D97706;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #475569;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'Mukta', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-card);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Connection status pill */
+.connection-pill {
+  @apply fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono;
+}
+
+.connection-pill.connected {
+  @apply bg-green-500/20 text-green-500 border border-green-500/30;
+}
+
+.connection-pill.disconnected {
+  @apply bg-red-500/20 text-red-500 border border-red-500/30;
+}
+
+.connection-pill .dot {
+  @apply w-2 h-2 rounded-full;
+}
+
+.connection-pill.connected .dot {
+  @apply bg-green-500 animate-pulse;
+}
+
+.connection-pill.disconnected .dot {
+  @apply bg-red-500;
+}
+
+/* Dashboard layout */
+.dashboard-layout {
+  @apply min-h-screen p-6 space-y-6;
+}
+
+.dashboard-grid {
+  @apply grid grid-cols-1 lg:grid-cols-5 gap-6;
+}
+
+.main-panel {
+  @apply lg:col-span-3;
+}
+
+.side-panels {
+  @apply lg:col-span-2 space-y-4;
+}
+
+/* Card styles */
+.card {
+  @apply bg-gray-800 border border-gray-700 rounded-lg p-4;
+}
+
+.card-elevated {
+  @apply bg-gray-700 border border-gray-600 rounded-lg p-4;
+}
+
+/* Status badges */
+.status-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-pending {
+  @apply bg-gray-600/20 text-gray-400;
+}
+
+.status-calling {
+  @apply bg-blue-500/20 text-blue-400;
+}
+
+.status-awaiting {
+  @apply bg-amber-500/20 text-amber-400;
+}
+
+.status-approved {
+  @apply bg-green-500/20 text-green-400;
+}
+
+.status-flagged {
+  @apply bg-red-500/20 text-red-400;
+}
+
+.status-rejected {
+  @apply bg-red-900/20 text-red-400;
+}
+
+/* Risk badges */
+.risk-safe {
+  @apply bg-green-500/20 text-green-400;
+}
+
+.risk-medium {
+  @apply bg-amber-500/20 text-amber-400;
+}
+
+.risk-suspicious {
+  @apply bg-red-500/20 text-red-400;
+}
+
+/* Language badges */
+.lang-hi {
+  @apply bg-orange-500/20 text-orange-400;
+}
+
+.lang-en {
+  @apply bg-blue-500/20 text-blue-400;
+}
+
+/* Pulse animation for active calls */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.33);
+  }
+  40%, 50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.33);
+  }
+}
+
+.pulse-ring {
+  animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-gray-700 hover:bg-gray-600 text-gray-100 px-4 py-2 rounded-lg font-medium transition-colors border border-gray-600;
+}
+
+.btn-success {
+  @apply bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors;
+}
+
+.btn-danger {
+  @apply bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors;
+}
+
+/* Table styles */
+.table {
+  @apply w-full border-collapse;
+}
+
+.table th {
+  @apply text-left text-gray-400 font-medium py-3 px-4 border-b border-gray-700;
+}
+
+.table td {
+  @apply py-3 px-4 border-b border-gray-700/50;
+}
+
+.table tr:hover {
+  @apply bg-gray-700/50;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors;
+}
+
+.form-label {
+  @apply block text-gray-400 font-medium mb-2;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-gray-800 border border-gray-700 rounded-lg p-6 max-w-md w-full mx-4;
+}

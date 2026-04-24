@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Bot Tester - Free Testing Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .status.idle {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status.recording {
+            background: #ffebee;
+            color: #c62828;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status.processing {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #recordBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        #stopBtn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .conversation {
+            margin-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message.bot {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .message-label {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .message-text {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .audio-player {
+            margin-top: 10px;
+        }
+        
+        audio {
+            width: 100%;
+            height: 30px;
+        }
+        
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #1976d2;
+        }
+        
+        .info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Voice Bot Tester</h1>
+        <p class="subtitle">Test your AI voice assistant without any telephony service!</p>
+        
+        <div id="status" class="status idle">
+            Ready to record. Click "Start Recording" to begin.
+        </div>
+        
+        <div class="controls">
+            <button id="recordBtn" onclick="startRecording()">🎤 Start Recording</button>
+            <button id="stopBtn" onclick="stopRecording()" disabled>⏹ Stop Recording</button>
+        </div>
+        
+        <div class="conversation" id="conversation">
+            <div class="info">
+                <strong>How to use:</strong>
+                1. Click "Start Recording"<br>
+                2. Speak in Hindi or English<br>
+                3. Click "Stop Recording"<br>
+                4. Wait for AI response<br>
+                5. Listen to the response
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        const API_URL = 'http://localhost:5000';
+        
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    await processAudio(audioBlob);
+                };
+                
+                mediaRecorder.start();
+                
+                document.getElementById('recordBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                updateStatus('recording', '🔴 Recording... Speak now!');
+                
+            } catch (error) {
+                alert('Microphone access denied! Please allow microphone access.');
+                console.error('Error:', error);
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                
+                document.getElementById('recordBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                updateStatus('processing', '⏳ Processing your audio...');
+            }
+        }
+        
+        async function processAudio(audioBlob) {
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.wav');
+            formData.append('session_id', 'web-test-' + Date.now());
+            
+            try {
+                updateStatus('processing', '⏳ Sending to AI... <span class="loader"></span>');
+                
+                const response = await fetch(`${API_URL}/api/v1/process`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
+                }
+                
+                const result = await response.json();
+                
+                // Display user message
+                addMessage('user', result.transcription || 'Audio sent');
+                
+                // Display bot response
+                addMessage('bot', result.response_text || 'No response', result.audio_response_b64);
+                
+                updateStatus('success', '✅ Response received! Record again to continue.');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                updateStatus('idle', '❌ Error: ' + error.message + '. Make sure server is running!');
+                addMessage('bot', 'Error: Could not process audio. Is the server running on port 5000?');
+            }
+        }
+        
+        function updateStatus(className, text) {
+            const statusEl = document.getElementById('status');
+            statusEl.className = 'status ' + className;
+            statusEl.innerHTML = text;
+        }
+        
+        function addMessage(type, text, audioBase64 = null) {
+            const conversation = document.getElementById('conversation');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + type;
+            
+            const label = type === 'user' ? 'You' : 'AI Assistant';
+            
+            let html = `
+                <div class="message-label">${label}</div>
+                <div class="message-text">${text}</div>
+            `;
+            
+            if (audioBase64 && type === 'bot') {
+                html += `
+                    <div class="audio-player">
+                        <audio controls autoplay>
+                            <source src="data:audio/mpeg;base64,${audioBase64}" type="audio/mpeg">
+                        </audio>
+                    </div>
+                `;
+            }
+            
+            messageDiv.innerHTML = html;
+            conversation.appendChild(messageDiv);
+            conversation.scrollTop = conversation.scrollHeight;
+        }
+        
+        // Check server status on load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    console.log('✅ Server is running');
+                }
+            } catch (error) {
+                updateStatus('idle', '⚠️ Server not running! Start it with: python app.py');
+            }
+        });
+    </script>
+</body>
+</html>
